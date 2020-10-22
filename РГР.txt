@@ -1,0 +1,384 @@
+// ConsoleApplication47.cpp: определяет точку входа для консольного приложения.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <conio.h>
+#include <fstream>
+#include <iomanip>
+#include <string>
+#include <Windows.h>
+
+using namespace std;
+
+struct date
+{
+
+	char name[25];
+	int day;
+	char month[25];
+	int year;
+	int numer;
+};
+
+int i;
+string path;// путь прописывается везде
+int number_cin;//номер удаляемой строки,массив начинается с 0 
+const int size_arr = 30;// размер структуы
+string choose;// выбор пункта меню
+int switch_choose;//после проверки присваевает целое число
+
+void write(date x[])
+{
+
+	ofstream fout;
+	fout.open(path);
+	if (fout.fail())
+	{
+
+		cout << "Ошибка открытия файла ";
+		exit(0);
+
+	}
+
+	for (int t = 0; t<i; t++)
+	{
+
+
+		fout << x[t].name << setw(10) << x[t].day << setw(10) << x[t].month << setw(9) << x[t].year << endl;
+	}
+
+	fout.close();
+}
+
+
+void inputfile(date x[])
+{
+link:
+	i = 0;
+	char iniz[10];
+
+	ifstream fin;
+
+	fin.open(path);
+	if (fin.fail())
+	{
+		cout << "!!! Неверный путь к файлу или файла не существует" << endl << endl << "Введите путь к файлу: ";
+		cin >> path; cout << "Новый путь к файлу сохранён: " << path << endl; goto link;
+
+	}
+
+	while (!fin.eof())
+	{
+
+		fin >> x[i].name >> iniz >> x[i].day >> x[i].month >> x[i].year;
+		strcat_s(x[i].name, " ");
+		strcat_s(x[i].name, iniz);
+
+		i++;
+	}
+	fin.close();
+
+	i -= 1;
+}
+
+
+void numerovka(date x[])
+{
+	int r = 1;
+	for (int f = 0; f < i; f++)
+	{
+		x[f].numer = r;
+		r++;
+	}
+}
+
+
+
+
+
+
+void del_zapic(date x[])
+{
+
+	number_cin--;
+
+	for (int f = number_cin; f < size_arr; f++)
+	{
+
+		x[f].numer = x[f + 1].numer;
+		x[f].year = x[f + 1].year;
+		x[f].day = x[f + 1].day;
+
+	}
+
+
+	for (int f = number_cin; f < size_arr; f++)
+	{
+
+		{
+			for (int ss = 0; ss < 25; ss++)
+			{
+				x[f].name[ss] = x[f + 1].name[ss];
+				x[f].month[ss] = x[f + 1].month[ss];
+			}
+
+		}
+
+	}
+
+	i -= 1; // последнюю строчку удаляем,потому что в конце два одинаковых
+}
+
+
+
+void add_zapic(date x[])
+
+{
+
+	char inic[10];
+
+	cout << endl << endl << "Фамилия: ";
+	cin >> x[i].name;
+	cout << "Инициалы в формате (А.В): ";
+	cin >> inic;
+	cout << "Родился (число): ";
+	cin >> x[i].day;
+	cout << "Введите месяц: ";
+	cin >> x[i].month;
+	cout << "Введите год: ";
+	cin >> x[i].year;
+
+	strcat_s(x[i].name, " ");
+	strcat_s(x[i].name, inic);
+
+
+	i++;
+	cout << endl << "Запись добавлена в память." << endl;
+}
+
+
+void poisk(date x[])
+{
+	string s = "июня";
+	string k = "июля";
+	string l = "августа";
+	string b = "июнь";
+	string z = "июль";
+	string u = "август";
+	for (int p = 0; p < i; p++)
+		if (x[p].month == s || x[p].month == k || x[p].month == l || x[p].month == b || x[p].month == z || x[p].month == u)
+
+			cout << setw(10) << "№ " << x[p].numer << "." << setw(20) << x[p].name << setw(10) << x[p].day << setw(10) << x[p].month << setw(8) << x[p].year << endl;
+}
+
+
+
+
+
+
+
+
+void sort(date x[])
+{
+	date temp;
+	for (int k = 0; k < i - 1; k++) {
+		for (int j = 0; j < i - k - 1; j++) {
+			if (x[j].year > x[j + 1].year) {
+
+
+				temp = x[j];
+				x[j] = x[j + 1];
+				x[j + 1] = temp;
+
+			}
+		}
+	}
+
+}
+
+
+
+void output(date x[])
+{
+
+	for (int f = 0; f < i; f++)
+		cout << setw(10) << "№ " << x[f].numer << "." << setw(20) << x[f].name << setw(10) << x[f].day << setw(10) << x[f].month << setw(8) << x[f].year << endl;
+
+}
+
+
+
+
+int main()
+{
+	SetConsoleCP(1251);// установка кодовой страницы win-cp 1251 в поток ввода
+	SetConsoleOutputCP(1251);// установка кодовой страницы win-cp 1251 в поток вывода
+
+
+	date a[size_arr];
+	int mem_filled;
+
+
+link:
+
+	cout << endl << "Меню:" << endl
+		<< "1. Указать путь к файлу." << endl
+		<< "2. Считать файл в буфер." << endl
+		<< "3. Вывести данные на экран." << endl
+		<< "4. Студенты,которые родились летом." << endl
+		<< "5. Записать данные в файл. " << path << endl
+		<< "6. Добавить запись в буфер." << endl
+		<< "7. Удалить запись из буфера." << endl
+		<< "8. Отсортировать года рождения в порядке возрастания." << endl
+		<< "9. Завершить программу." << endl << endl
+		<< "Выберите пункт меню: ";
+	cin >> choose;
+
+
+
+	//Проверка введенного значение в меню
+	for (int h = 0; h < 10;)
+	{
+		string mss[10]{ "0","1","2","3","4","5","6","7","8","9" };
+
+
+		if (mss[h] == choose)
+		{
+			switch_choose = h;
+			break;
+		}
+		h++;
+		if (h == 10)
+		{
+			switch_choose = 0;
+		}
+
+
+	}
+
+
+
+
+	cout << endl;
+	switch (switch_choose)
+	{
+
+	case 1:
+		cout << "Путь к файлу: ";
+		cin >> path;
+		cout << endl;
+		cout << "Путь к файлу " << path << " сохранён" << endl;
+		goto link;
+
+	case 2:
+		if (i == 0)
+		{
+		link_mem_filled2:
+			inputfile(a);
+			numerovka(a);
+			cout << endl << "Чтение данных из " << path << " в буфер завершено." << endl;
+			goto link;
+		}
+		else cout << "!!! Файл уже был считан в буфер, считать и перезаписать еще раз?" << endl << endl;
+		goto link_mem_filled;
+
+	case 3:
+
+		if (i == 0)
+		{
+
+			cout << "!!! Нечего выводить на экран, файл не считан" << endl;
+			goto link;
+		}
+		else
+			output(a);
+		goto link;
+
+	case 4:
+		cout << "Студенты,которые родились летом:" << endl << endl;
+
+		poisk(a);
+		goto link;
+
+
+		goto link;
+	case 5:
+
+		write(a);
+		cout << "Данные успешно записаны в " << path << endl;
+		goto link;
+
+	case 6:
+
+		add_zapic(a);
+		numerovka(a);
+		output(a);
+
+		goto link;
+	case 7:
+		cout << "Выбор записи для удаления: "; cin >> number_cin;
+
+		del_zapic(a);
+		numerovka(a);
+		output(a);
+		goto link;
+
+	case 8:
+		sort(a);
+		numerovka(a);
+		output(a);
+		goto link;
+
+
+	case 9:
+		exit(0);
+
+
+	case 0:
+		cout << "!!! Данного пункта меню не существует, попробуйте еще раз:" << endl;
+		goto link;
+
+
+	default:
+		cout << "!!! Данного пункта меню не существует, попробуйте еще раз:" << endl;
+		goto link;
+
+	}
+link_mem_filled:
+
+	cout << "1. Да" << endl;
+	cout << "2. Вернуться в Меню" << endl << endl;
+	cout << "Выберите действие: "; cin >> mem_filled;
+	cout << endl;
+
+	switch (mem_filled)
+	{
+
+	case 1:
+		goto link_mem_filled2;
+	case 2:
+		goto link;
+
+	default:
+
+
+		cout << "!!! Данного пункта меню не существует, попробуйте еще раз:" << endl << endl;
+		goto link_mem_filled;
+		break;
+	}
+
+	_getch();
+
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
